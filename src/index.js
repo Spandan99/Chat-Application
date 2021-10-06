@@ -2,6 +2,7 @@
 const express = require('express')
 const http = require('http')
 const path = require('path')
+const port = process.env.PORT || 3000
 const socketio = require('socket.io')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
 const { addUser,removeUser,getUser,getUserInRoom } = require('./utils/users')
@@ -63,6 +64,6 @@ io.on('connection', (socket) => {
     })
 })
 
-server.listen(3000, (req, res) => {
+server.listen(port, () => {
     console.log("Server is up at 3000!")
 })

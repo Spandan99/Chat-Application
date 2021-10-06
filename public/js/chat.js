@@ -1,11 +1,11 @@
 const socket = io()
 
 //Elements
-const $messageForm = document.querySelector('#message-form')
-const $messageFormInput = $messageForm.querySelector('input')
-const $messageFormButton = $messageForm.querySelector('button')
-const $sendLocationButton = document.querySelector('#send-location')
-const $messages = document.querySelector('#messages')
+const messageForm = document.querySelector('#message-form')
+const messageFormInput = messageForm.querySelector('input')
+const messageFormButton = messageForm.querySelector('button')
+const sendLocationButton = document.querySelector('#send-location')
+const messages = document.querySelector('#messages')
 
 
 //Templates
@@ -18,24 +18,24 @@ const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true }
 
 const autoscroll = () => {
     //New message element
-    const $newMessage = $messages.lastElementChild
+    const newMessage = messages.lastElementChild
 
     //Height of the new message
-    const newMessageStyles = getComputedStyle($newMessage)
+    const newMessageStyles = getComputedStyle(newMessage)
     const newMessageMargin = parseInt(newMessageStyles.marginBottom)
-    const newMessageHeight = $newMessage.offsetHeight + newMessageMargin
+    const newMessageHeight = newMessage.offsetHeight + newMessageMargin
 
     //visible height
-    const visibleHeight = $messages.offsetHeight
+    const visibleHeight = messages.offsetHeight
 
     //height of messages container
-    const containerHeight = $messages.scrollHeight
+    const containerHeight = messages.scrollHeight
 
     //How far have i scrolled
-    const scrollOffset = $messages.scrollTop + visibleHeight
+    const scrollOffset = messages.scrollTop + visibleHeight
 
     if(containerHeight - newMessageHeight <= scrollOffset) {
-        $messages.scrollTop = $messages.scrollHeight
+        messages.scrollTop = messages.scrollHeight
     }
 }
 
@@ -46,7 +46,7 @@ socket.on('message', (message) => {
         message: message.text,
         createdAt: moment(message.createdAt).format('h:mm a')
     })
-    $messages.insertAdjacentHTML('beforeend', html)
+    messages.insertAdjacentHTML('beforeend', html)
     autoscroll()
 })
 
@@ -57,7 +57,7 @@ socket.on('locationMessage', (url) => {
         url: url.url,
         createdAt: moment(url.createdAt).format('h:mm a')
     })
-    $messages.insertAdjacentHTML('beforeend', html)
+    messages.insertAdjacentHTML('beforeend', html)
     autoscroll()
 })
 
@@ -69,19 +69,19 @@ socket.on('roomData', ({ room, users }) => {
     document.querySelector('#sidebar').innerHTML = html
 })
 
-$messageForm.addEventListener('submit', (e) => {
+messageForm.addEventListener('submit', (e) => {
    e.preventDefault()
 
-   $messageFormButton.setAttribute('disabled', 'disabled')
+   messageFormButton.setAttribute('disabled', 'disabled')
   
    let message = e.target.elements.message.value
 
    socket.emit('message', message,(error) => {
 
 
-    $messageFormButton.removeAttribute('disabled')
-    $messageFormInput.value = ''
-    $messageFormInput.focus()
+    messageFormButton.removeAttribute('disabled')
+    messageFormInput.value = ''
+    messageFormInput.focus()
 
     if(error) {
         return console.log(error)
@@ -91,16 +91,16 @@ $messageForm.addEventListener('submit', (e) => {
    console.log('Message Delivered')
 })
 
-$sendLocationButton.addEventListener('click', () => {
+sendLocationButton.addEventListener('click', () => {
     if(!navigator.geolocation){
         return alert('Geolocation is not supported by your browser')
     }
-    $sendLocationButton.setAttribute('disabled', 'disabled')
+    sendLocationButton.setAttribute('disabled', 'disabled')
 
    navigator.geolocation.getCurrentPosition((position) => {
             socket.emit('send-location',  { latitude: position.coords.latitude,
            longitude: position.coords.longitude }, () => {
-               $sendLocationButton.removeAttribute('disabled')
+               sendLocationButton.removeAttribute('disabled')
                console.log("Location Shared")
            })
    })
